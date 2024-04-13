@@ -154,8 +154,7 @@ class Notification {
       date: admin.firestore.FieldValue.serverTimestamp(),
     };
     logger.info("New notification created:", newNotification);
-    await notificationsRef.doc('notification '+id).set(newNotification);
-    
+    await notificationsRef.doc("notification "+id).set(newNotification);
   }
 }
 
