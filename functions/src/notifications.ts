@@ -33,7 +33,7 @@ class Notification {
       // Since `limit(1)` is used,
       // there should only be one document.
       const patientDoc = patientQuerySnapshot.docs[0];
-      // const patientId = patientDoc.id;
+      const patientId = patientDoc.id;
       // This is the document ID of the patient
       const patientData = patientDoc.data(); // This is the patient data
       const threshold = patientData.threshold;
@@ -45,7 +45,7 @@ class Notification {
       } else {
         // Handle the case when the temperature reading is within the threshold
         await this.createNewNotification(patientData.device_id,
-          patientData.id, "Vital Alert");
+          patientId, "Vital Alert");
         console.log("Temperature reading is within threshold");
       }
 
@@ -56,7 +56,7 @@ class Notification {
       } else {
         // Handle the case when the heart rate reading is within the threshold
         await this.createNewNotification(patientData.device_id,
-          patientData.id, "Vital Alert");
+          patientId, "Vital Alert");
         console.log("Heart rate reading is within threshold");
       }
     } catch (error) {
@@ -147,14 +147,15 @@ class Notification {
     const id = (notificationsSnapshot.size + 1).toString();
     const newNotification = {
       id: id,
-      patientId: patientId,
+      patient_id: patientId,
       notificationType: notificationType,
       heartRateSpots: vitalSignsReadings.heartRate,
       temperatureSpots: vitalSignsReadings.temperature,
       date: admin.firestore.FieldValue.serverTimestamp(),
     };
     logger.info("New notification created:", newNotification);
-    await notificationsRef.add(newNotification);
+    await notificationsRef.doc('notification '+id).set(newNotification);
+    
   }
 }
 
