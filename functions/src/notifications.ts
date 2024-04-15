@@ -1,11 +1,11 @@
 import * as admin from "firebase-admin";
-import {DocumentData} from "firebase-admin/firestore";
+import {DocumentData, DocumentReference} from "firebase-admin/firestore";
 import * as functions from "firebase-functions";
 import * as logger from "firebase-functions/logger";
 
 /**
- * The Notification class handles the notification logic.
- */
+* The Notification class handles the notification logic.
+*/
 class Notification {
   /**
   * handle the threshold logic for the patient.
@@ -33,7 +33,7 @@ class Notification {
       // Since `limit(1)` is used,
       // there should only be one document.
       const patientDoc = patientQuerySnapshot.docs[0];
-      const patientId = patientDoc.id;
+      const patientId = patientDoc.ref;
       // This is the document ID of the patient
       const patientData = patientDoc.data(); // This is the patient data
       const threshold = patientData.threshold;
@@ -85,8 +85,8 @@ class Notification {
         const temperature = readingData.temperature;
         const heartRate = readingData.heartRate;
 
-        temperatureReadings.push({x: x, y: temperature});
-        heartRateReadings.push({x: x, y: heartRate});
+        temperatureReadings.push({x: x, y: Number(temperature)});
+        heartRateReadings.push({x: x, y: Number(heartRate)});
 
         x += 10;
       });
@@ -131,12 +131,12 @@ class Notification {
   }
   /**
   * create a new notification for the patient.
- * @param {string} deviceId - The device ID.
- * @param {string} patientId - The patient ID.
- * @param {string} notificationType - The notification type.
+  * @param {string} deviceId - The device ID.
+  * @param {DocumentReference} patientId - The patient ID.
+  * @param {string} notificationType - The notification type.
   */
   async createNewNotification(deviceId: string,
-    patientId: string, notificationType: string) {
+    patientId: DocumentReference, notificationType: string) {
     // Create a new notification document in the "notifications" collection
     logger.info("Creating new notification");
     logger.info("Device ID:", deviceId);
