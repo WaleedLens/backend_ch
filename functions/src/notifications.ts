@@ -98,38 +98,6 @@ class Notification {
     }
   }
   /**
-  * get the temperature value from the raw data.
-  * @param {string} rawData - The raw data.
-  */
-  async getTemperature(rawData: string) {
-    // Get the temperature value from the raw data
-    const regex = /Object = (\d+\.\d+)/;
-    const match = rawData.match(regex);
-    if (match) {
-      const temperature = parseFloat(match[1]);
-      logger.log("Temperature:", temperature);
-      return temperature;
-    } else {
-      throw new Error("Unable to extract object temperature from raw data");
-    }
-  }
-  /**
-  * get the heart rate value from the raw data.
-  * @param {string} rawData - The raw data.
-  */
-  async getHeartRate(rawData: string) {
-    // Get the HeartRate value from the raw data
-    const regex = /Avg BPM = (\d+\.\d+)/;
-    const match = rawData.match(regex);
-    if (match) {
-      const heartRate = parseFloat(match[1]);
-      logger.info("HeartRate:", heartRate);
-      return heartRate;
-    } else {
-      throw new Error("Unable to extract BDM HeartRate from raw data");
-    }
-  }
-  /**
   * create a new notification for the patient.
   * @param {string} deviceId - The device ID.
   * @param {DocumentReference} patientId - The patient ID.
