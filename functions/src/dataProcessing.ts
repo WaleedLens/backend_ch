@@ -36,11 +36,10 @@ class DataProcessing {
       const readingsCollection = admin.firestore().collection("readings_data");
       await readingsCollection.add({
         deviceId: deviceDoc.ref,
-        temperature: this.getTemperature(String(temperature)),
-        heartRate: this.getHeartRate(String(heartRate)),
+        temperature: String(await this.getTemperature(String(temperature))),
+        heartRate: String(await this.getHeartRate(String(heartRate))),
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
       });
-
       // Return success response
       return {success: true};
     } catch (error) {
@@ -70,7 +69,7 @@ class DataProcessing {
   */
   async getHeartRate(rawData: string) {
     // Get the HeartRate value from the raw data
-    const regex = /Avg BPM = (\d+\.\d+)/;
+    const regex = /Avg BPM=(\d+)/;
     const match = rawData.match(regex);
     if (match) {
       const heartRate = parseFloat(match[1]);
@@ -80,6 +79,5 @@ class DataProcessing {
       throw new Error("Unable to extract BDM HeartRate from raw data");
     }
   }
-
 }
 export {DataProcessing};
