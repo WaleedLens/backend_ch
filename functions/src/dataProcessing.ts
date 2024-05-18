@@ -1,7 +1,7 @@
 import * as Express from "express";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
-
+import {Notification} from "./notifications";
 /**
  * The DataProcessing class handles the data processing logic.
  */
@@ -15,8 +15,59 @@ class DataProcessing {
 
     if ("acceleration" in request.body) {
       this.createAccelerationData(request);
+    } else if ("SOS" in request.body) {
+      logger.info("IAM HERE SOOOOOS");
+      this.createSosNotification(request);
     } else {
       this.createReadingsData(request);
+    }
+  }
+  /**
+  * Handles the request and processes the data.
+  * @param {Express.Request} request - The request object.
+  */
+  async createSosNotification(request: Express.Request) {
+    try {
+      const deviceId = request.body.deviceId;
+      if (!deviceId) {
+        throw new Error("Device ID is missing from the request");
+      }
+      const devicesCollection = admin.firestore().collection("devices");
+      const deviceDoc = await devicesCollection.doc(deviceId).get();
+      const deviceData = deviceDoc.data();
+
+      if (!deviceData) {
+        logger.info("Device Data !!!!");
+        throw new Error("Device data is missing");
+      }
+
+      const deviceRef = devicesCollection
+        .doc(deviceId); // Get the reference to the device document
+      const patientsCollection = admin.firestore().collection("patients");
+      const patientQuerySnapshot = await patientsCollection
+        .where("device_id", "==", deviceRef).get();
+      if (patientQuerySnapshot.empty) {
+        logger.info("PATIENT !!!!");
+        throw new Error("No patient found for the device");
+      }
+      const patientDoc = patientQuerySnapshot
+        .docs[0]; // Get the first patient document
+      const patientData = patientDoc.data();
+
+      if (!patientData) {
+        logger.info("PATIENT DATA !!!!");
+        throw new Error("Patient data is missing");
+      }
+      // Create a new notification
+      const notifications = new Notification();
+      logger.info("OK WE ARE HERE NOW .........");
+      notifications.createNewNotification(deviceId, patientDoc.ref, "SOS");
+      // Return success response
+      return {success: true};
+    } catch (error) {
+      // Return error response
+      logger.info("OPS !! there's an error!!!");
+      return {success: false, error: "Cannot create new SOS notification. "};
     }
   }
 
