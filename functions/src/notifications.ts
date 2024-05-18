@@ -72,15 +72,22 @@ class Notification {
   Promise<{ temperature: { x: number, y: number }[],
    heartRate: { x: number, y: number }[] }> {
     try {
+      const devicesCollection = admin.firestore().collection("devices");
+      const deviceRef = devicesCollection.doc(deviceId);
       const readingsRef = admin.firestore().collection("readings_data");
-      const querySnapshot = await readingsRef.where("deviceId", "==", deviceId)
-        .orderBy("timestamp", "desc").limit(3).get();
-
+      const querySnapshot = await readingsRef
+        .where("deviceId", "==", deviceRef)
+        .orderBy("timestamp", "desc")
+        .limit(3)
+        .get();
+      logger.info("Device ID: ---> ", deviceId);
+      logger.info("QUERY --> ", querySnapshot.size);
       const temperatureReadings: { x: number, y: number }[] = [];
       const heartRateReadings: { x: number, y: number }[] = [];
 
       let x = 0;
       querySnapshot.forEach((doc) => {
+        logger.info("X: ", x);
         const readingData = doc.data() as DocumentData;
         const temperature = readingData.temperature;
         const heartRate = readingData.heartRate;
@@ -112,7 +119,7 @@ class Notification {
 
     const notificationsRef = admin.firestore().collection("notifications");
     const notificationsSnapshot = await notificationsRef.get();
-    const id = (notificationsSnapshot.size + 1).toString();
+    const id = (notificationsSnapshot.size + 2).toString();
     const newNotification = {
       id: id,
       patient_id: patientId,
@@ -121,6 +128,7 @@ class Notification {
       temperatureSpots: vitalSignsReadings.temperature,
       date: admin.firestore.FieldValue.serverTimestamp(),
     };
+    logger.info("ID ---> ", id);
     logger.info("New notification created:", newNotification);
     await notificationsRef.doc("notification "+id).set(newNotification);
   }
