@@ -14,8 +14,8 @@ class DataProcessing {
     // Process the data in the request
 
     if ("acceleration" in request.body) {
-      this.createAccelerationData(request);
-      this.createFdNotification(request);
+      await this.createAccelerationData(request);
+      await this.createFdNotification(request);
     } else if ("SOS" in request.body) {
       logger.info("IAM HERE SOOOOOS");
       this.createSosNotification(request);
