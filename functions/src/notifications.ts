@@ -44,7 +44,7 @@ class Notification {
         console.log("Temperature reading exceeds threshold");
       } else {
         // Handle the case when the temperature reading is within the threshold
-        await this.createNewNotification(patientData.device_id,
+        await this.createNewNotif(patientData.device_id,
           patientId, "Vital Alert");
         console.log("Temperature reading is within threshold");
       }
@@ -55,7 +55,7 @@ class Notification {
         console.log("Heart rate reading exnceeds threshold");
       } else {
         // Handle the case when the heart rate reading is within the threshold
-        await this.createNewNotification(patientData.device_id,
+        await this.createNewNotif(patientData.device_id,
           patientId, "Vital Alert");
         console.log("Heart rate reading is within threshold");
       }
@@ -110,7 +110,7 @@ class Notification {
   * @param {DocumentReference} patientId - The patient ID.
   * @param {string} notificationType - The notification type.
   */
-  async createNewNotification(deviceId: string,
+  async createNewNotif(deviceId: string,
     patientId: DocumentReference, notificationType: string) {
     // Create a new notification document in the "notifications" collection
     logger.info("Creating new notification");
